@@ -1,59 +1,24 @@
-# ShiftRecoverPy
+# estimate-recovery-time-for-patient
 
-**Personalized estimation of post-shift recovery from longitudinal wearable data**
+**Personal estimation of recovery after shift work using longitudinal wearable data**
 
-ShiftRecoverPy is a reproducible Python toolkit for estimating how many days an
-individual needs to return to their own baseline after a block of shift work.
-The project is motivated by research on temporal eating patterns during shift
-work and extends the same sequence-based idea to wearable sleep, heart-rate and
-activity data.
+`estimate-recovery-time-for-patient` is a reproducible Python toolkit. It estimates how many days a person needs to return to their own baseline after shift work.
 
-The key question is not whether the average night worker differs from the
-average day worker. It is:
+This project comes from my research on eating patterns in police officers who work shifts. In this research, I found that there is still a lack of methods to calculate recovery time after different shift patterns.
 
-> After the final shift in a work block, on which day does this person return
-> to their usual physiological and behavioural range?
+This project uses the same idea of analysing data over time. It applies this idea to wearable data, including sleep, heart rate, and activity data.
 
-## Current status
+The main question is:
 
-Version `0.1.0` is a working method prototype. It currently provides:
+> After the last shift in a work period, how many days does a person need to return to their normal physical and behavioural state?
 
-- a transparent 28-day synthetic shift-work dataset;
-- robust participant-specific baselines;
-- correct circular calculations for clock-time variables;
-- a multivariable daily deviation score;
-- recovery detection requiring two consecutive recovered days;
-- censoring when recovery cannot be observed before the next work block;
-- unit tests for clock arithmetic and recovery detection.
+## Include：
 
-The first open-data adapter reads the participant-level Mauvieux sleep
-tables. Inspection of the released files showed that observations are aggregated
-into three study phases rather than participant-days. The adapter therefore
-supports transparent phase comparisons but deliberately refuses to describe the
-result as a day-level recovery-time estimate.
 
-The Bourdillon adapter now ingests real daily RR-interval recordings from a
-baseline–partial-sleep-deprivation–recovery experiment. It handles combined and
-posture-separated files, preserves raw values, flags rather than silently removes
-questionable intervals, and produces session and participant coverage audits.
-The second processing stage creates an interval-level RR-to-NN audit trail and
-calculates quality-controlled RMSSD and SDNN separately for each posture.
-The third stage estimates robust personal HRV centres and operational normal
-ranges from QC-passing baseline dates.
-The fourth stage aligns recovery days 1–7 and calculates signed, absolute, and
-composite deviations from those personal baselines without filling missing days.
-The fifth stage identifies the first of two consecutive recovered days and
-retains unrecovered eligible series as right-censored observations.
-The sixth stage repeats that algorithm under four recovery thresholds and
-automatically audits the expected threshold monotonicity.
-The seventh stage compares personal versus population-average baselines and
-one-day versus two-day confirmation on one fixed, paired risk set.
-The eighth stage uses participant-cluster bootstrap resampling to attach
-uncertainty intervals to recovery proportions and time-to-recovery summaries.
-The ninth stage generates four reproducible core figures in GitHub-ready PNG
-and editable SVG formats.
-The tenth stage provides 67 automated tests, an 80% coverage gate and GitHub
-Actions checks on Python 3.10 and 3.12; current core-library coverage is 87%.
+
+Two public datasets are used. The Mauvieux dataset provides sleep results from three study stages. These data can be used to compare changes between the stages. The Bourdillon dataset comes from an experiment with a baseline period, a partial sleep deprivation period, and a recovery period. It provides daily RR interval records. The RR intervals are checked for data quality and then converted into NN intervals. RMSSD and SDNN are then calculated for different body positions. A personal HRV baseline and normal range are created from each participant’s baseline condition. The recovery data are arranged from day 1 to day 7. The difference between each recovery day and the personal baseline is then calculated. Missing data are excluded from this calculation.
+
+Recovery is defined as two consecutive days within the normal range. The first of these two days is recorded as the recovery day. If recovery is not observed before the end of follow-up, the record is treated as right-censored. Four recovery thresholds are used to check whether the results are stable. Personal baselines are compared with the population average baseline. A one-day recovery rule is also compared with a two-day recovery rule. Bootstrap resampling is performed at the participant level. It provides uncertainty intervals for the recovery proportion and recovery time. The final results include a study timeline, individual recovery trajectories, a recovery-day heatmap, and Kaplan–Meier recovery curves.
 
 ## Why personal baselines?
 
