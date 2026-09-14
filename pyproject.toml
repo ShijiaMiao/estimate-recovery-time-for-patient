@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "shiftrecoverpy"
+version = "0.1.0"
+description = "Personalized estimation of post-shift recovery from longitudinal wearable data"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [{name = "Shijia Zhao"}]
+dependencies = [
+  "matplotlib>=3.8",
+  "numpy>=1.24",
+  "openpyxl>=3.1",
+  "pandas>=2.0",
+]
+
+[project.optional-dependencies]
+dev = ["coverage>=7.6", "pytest>=8", "ruff>=0.6"]
+
+[project.scripts]
+shiftrecover = "shiftrecover.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.coverage.run]
+source = ["shiftrecover"]
+omit = ["src/shiftrecover/cli.py"]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+skip_covered = true
