@@ -12,32 +12,18 @@ The main question is:
 
 > After the last shift in a work period, how many days does a person need to return to their normal physical and behavioural state?
 
-## Include：
 
-
+## What I did
 
 Two public datasets are used. The Mauvieux dataset provides sleep results from three study stages. These data can be used to compare changes between the stages. The Bourdillon dataset comes from an experiment with a baseline period, a partial sleep deprivation period, and a recovery period. It provides daily RR interval records. The RR intervals are checked for data quality and then converted into NN intervals. RMSSD and SDNN are then calculated for different body positions. A personal HRV baseline and normal range are created from each participant’s baseline condition. The recovery data are arranged from day 1 to day 7. The difference between each recovery day and the personal baseline is then calculated. Missing data are excluded from this calculation.
 
 Recovery is defined as two consecutive days within the normal range. The first of these two days is recorded as the recovery day. If recovery is not observed before the end of follow-up, the record is treated as right-censored. Four recovery thresholds are used to check whether the results are stable. Personal baselines are compared with the population average baseline. A one-day recovery rule is also compared with a two-day recovery rule. Bootstrap resampling is performed at the participant level. It provides uncertainty intervals for the recovery proportion and recovery time. The final results include a study timeline, individual recovery trajectories, a recovery-day heatmap, and Kaplan–Meier recovery curves.
 
-## Why personal baselines?
 
-There is no single normal bedtime, resting heart rate, or number of steps for
-every person. ShiftRecoverPy therefore compares each participant with their own
-stable off-duty observations. Baselines are estimated with robust statistics so
-that one unusual day does not dominate the result.
-
-Clock times are treated as circular. For example, 23:30 and 00:30 are one hour
-apart, not 23 hours apart.
-
-## Quick start
-
-Python 3.10 or newer is recommended.
+## Quick start Python 3.10
 
 ```bash
 python -m venv .venv
-# Windows PowerShell
-.venv\Scripts\Activate.ps1
 python -m pip install -e .
 python -m shiftrecover.cli demo --output-dir results/demo
 python -m unittest discover -s tests -v
@@ -104,27 +90,9 @@ python -m shiftrecover.cli bourdillon-figures \
   --output-dir docs/figures
 ```
 
-The Bourdillon command creates a posture-aware interval table, a session-level
-QC audit, participant phase coverage, and a Markdown ingestion report. The
-second command flags suspected artefacts, creates interpolated NN intervals,
-and calculates RMSSD and SDNN using a standardized three-minute posture window.
-See [`docs/HRV_METHODS.md`](docs/HRV_METHODS.md) for the complete specification.
-Personal baseline eligibility and robust range construction are documented in
-[`docs/BASELINE_METHODS.md`](docs/BASELINE_METHODS.md).
-Recovery-day alignment and deviation formulas are documented in
-[`docs/DEVIATION_METHODS.md`](docs/DEVIATION_METHODS.md).
-First recovery and right-censoring rules are documented in
-[`docs/RECOVERY_EVENT_METHODS.md`](docs/RECOVERY_EVENT_METHODS.md).
-Threshold sensitivity and its logical audit are documented in
-[`docs/THRESHOLD_SENSITIVITY_METHODS.md`](docs/THRESHOLD_SENSITIVITY_METHODS.md).
-The paired baseline and confirmation-rule comparison is documented in
-[`docs/METHOD_COMPARISON_METHODS.md`](docs/METHOD_COMPARISON_METHODS.md).
-Participant-cluster resampling and uncertainty statistics are documented in
-[`docs/BOOTSTRAP_METHODS.md`](docs/BOOTSTRAP_METHODS.md).
-Figure construction and interpretation are documented in
-[`docs/FIGURE_METHODS.md`](docs/FIGURE_METHODS.md).
-The test matrix, coverage scope and quality checks are documented in
-[`docs/TESTING.md`](docs/TESTING.md).
+## Documentation
+
+More information about data processing, HRV calculation, recovery analysis, figures, and testing is available in the [`docs` folder](docs/).
 
 ## Core figures
 
@@ -151,42 +119,24 @@ The demo creates:
 - `daily_deviation_scores.csv`: standardized deviations from baseline;
 - `recovery_events.csv`: estimated recovery time after every night-shift block.
 
-## Recovery definition in version 0.1
 
-For each participant and each variable:
+## How recovery is defined
 
-1. Estimate the centre and variability from eligible stable off-duty days.
-2. Express each later observation as an absolute robust standardized deviation.
-3. Combine available variables using the root-mean-square deviation.
-4. Start follow-up on the first calendar day after the final night shift.
-5. Define recovery as the first of two consecutive off-duty days with a score
-   at or below the chosen threshold.
-6. Mark the event as censored if another work block begins or follow-up ends
-   before recovery is demonstrated.
+Each participant is compared with their own baseline. A daily score shows how far the participant is from their normal range. Recovery requires two consecutive off-duty days within the chosen range. The first of these two days is recorded as the recovery day. If a new work period starts or follow-up ends before recovery, the observation is right-censored.
 
-The default demonstration variables are sleep onset, sleep midpoint, total
-sleep time, sleep efficiency, resting heart rate, and daily steps. Thresholds
-and included variables must be evaluated in sensitivity analyses rather than
-treated as universal clinical cut-offs.
 
 ## Data
 
-Raw participant data are never committed to this repository. See
-[`docs/DATA_DOWNLOAD_CN.md`](docs/DATA_DOWNLOAD_CN.md) for exact access steps.
-The standardized Bourdillon output fields and ingestion assumptions are listed
-in [`docs/BOURDILLON_DATA_DICTIONARY.md`](docs/BOURDILLON_DATA_DICTIONARY.md).
+Data access instructions are available in [docs/DATA_DOWNLOAD_CN.md](docs/DATA_DOWNLOAD_CN.md).
 
-- **Mauvieux 2025**: directly downloadable, CC BY 4.0. The release contains
-  participant-level sleep and derived circadian parameters for three aggregated
-  phases, plus group fitted curves. It can demonstrate open-data ingestion and
-  phase comparison, but cannot identify the exact recovery day.
-- **TILES-2018**: public research access after account registration and a signed
-  Data Usage Agreement; 212 hospital workers followed for approximately ten
-  weeks with Fitbit sleep, heart rate and steps, plus work-day metadata.
-- **Bourdillon 2021**: openly released morning orthostatic-test RR intervals from
-  a one-week baseline, three-night partial sleep-deprivation, and one-week
-  recovery protocol. It validates the physiological recovery workflow but is
-  not itself a shift-worker cohort.
+The standard output fields and data reading rules for the Bourdillon dataset are available in [docs/BOURDILLON_DATA_DICTIONARY.md](docs/BOURDILLON_DATA_DICTIONARY.md).
+
+- **Mauvieux 2025**: The data can be downloaded directly. They are available under the CC BY 4.0 licence. The dataset includes sleep measures and circadian rhythm measures from three study stages. It also includes fitted curves for the study group.
+
+- **TILES-2018**: This study followed 212 hospital workers for about ten weeks. The data include sleep, heart rate, and steps recorded by Fitbit. They also include workday information.
+
+- **Bourdillon 2021**: This dataset provides RR interval data from morning posture tests. The study included a one-week baseline period, three nights of partial sleep deprivation, and a one-week recovery period.
+
 
 ## Repository layout
 
@@ -225,19 +175,10 @@ ShiftRecoverPy/
 └── pyproject.toml
 ```
 
-## Research interpretation
+## Interpretation of results
 
-The output is a method-derived recovery estimate, not a medical diagnosis. A
-short observational window produces right-censored recovery times. Associations
-with health outcomes are observational and should not be interpreted causally.
-
-## Data governance
-
-This repository does not contain Airwave Health Monitoring Study participant
-data. Those data were accessed under research governance and cannot be
-redistributed. The present software is developed with synthetic benchmarks and
-independent public or research-access datasets.
+This project uses the defined method to estimate a patient’s recovery time. The relationship between recovery time and health outcomes is observational. It should not be interpreted as a causal relationship.
 
 ## Licence
 
-Code is released under the MIT License. Source datasets retain their own terms.
+The project code is released under the MIT License. Each source dataset remains subject to its own terms of use.
